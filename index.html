@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>Bumpy</title>
+<style type="text/css">
+#Pic1image,#Pic2image {
+  height: 400px;
+}
+#caption1,#caption2 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  font-family: Helvetica;
+  background-color: rgba(0,0,0,0.7);
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+}
+#Group1,#Group2 {
+  position: relative;
+}
+#outerGroup {
+  display: flex;
+  flex-direction: row;
+}
+</style>
+</head>
+<body>
+  <h1>Bumpy</h1>
+  <label for="Pic1">Choose your first picture:</label> <br/>
+  <p>
+    <input type="file"
+    id="Pic1" name="Pic1"
+    accept="image/png, image/jpeg">
+  </p>
+  Text For First Picture: <input type="text" name="Text1" id="text1" placeholder="Week 4" /><br>
+  <br/>
+  <label for="Pic2">Choose your second picture:</label> <br/>
+  <p>
+    <input type="file"
+    id="Pic2" name="Pic2"
+    accept="image/png, image/jpeg">
+  </p>
+  Text For Second Picture: <input type="text" name="Text2" id="text2" placeholder="Week 8"><br>
+  <br/>
+  <div id="outerGroup">
+    <div id="Group1"> <img id="Pic1image" src="file:///Users/joellekaiser/Downloads/IMG_20190308_140322_grande.jpg"/> <span id="caption1"> Week 4 </span> </div>
+    <div id="Group2"> <img id="Pic2image" src="file:///Users/joellekaiser/Downloads/IMG_20190308_140322_grande.jpg"/> <span id="caption2"> Week 8 </span> </div>
+  </div>
+  <div id="captionOuter">
+  </div>
+    <script type="text/javascript">
+    document.getElementById('Pic1').onchange = function (evt) {
+    var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+
+    // FileReader support
+    if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById("Pic1image").src = fr.result;
+        }
+        fr.readAsDataURL(files[0]);
+    }
+
+    // Not supported
+    else {
+        // fallback -- perhaps submit the input to an iframe and temporarily store
+        // them on the server until the user's session ends.
+    }
+}
+document.getElementById('Pic2').onchange = function (evt) {
+var tgt = evt.target || window.event.srcElement,
+    files = tgt.files;
+
+// FileReader support
+if (FileReader && files && files.length) {
+    var fr = new FileReader();
+    fr.onload = function () {
+        document.getElementById("Pic2image").src = fr.result;
+    }
+    fr.readAsDataURL(files[0]);
+}
+
+// Not supported
+else {
+    // fallback -- perhaps submit the input to an iframe and temporarily store
+    // them on the server until the user's session ends.
+}
+}
+document.getElementById("text1").onkeyup=function(evt){
+  document.getElementById("caption1").innerHTML = evt.target.value;
+}
+document.getElementById("text2").onkeyup=function(evt){
+  document.getElementById("caption2").innerHTML = evt.target.value;
+}
+</script>
+</body>
+</html>
