@@ -23,7 +23,29 @@
   display: flex;
   flex-direction: row;
 }
+.flip {
+
+}
+.rotate-180 {
+
+}
+.flip-and-rotate-180 {
+
+}
+.flip-and-rotate-270 {
+
+}
+.rotate-90 {
+  transform: rotate(90deg);
+}
+.flip-and-rotate-90 {
+
+}
+.rotate-270 {
+
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 </head>
 <body>
   <h1>Bumpy</h1>
@@ -42,55 +64,71 @@
   Text For Second Picture: <input type="text" name="Text2" id="text2" placeholder="Week 8"><br>
   <br/>
   <div id="outerGroup">
-    <div id="Group1"> <img id="Pic1image" src="file:///Users/joellekaiser/Downloads/IMG_20190308_140322_grande.jpg"/> <span id="caption1"> Week 4 </span> </div>
-    <div id="Group2"> <img id="Pic2image" src="file:///Users/joellekaiser/Downloads/IMG_20190308_140322_grande.jpg"/> <span id="caption2"> Week 8 </span> </div>
+    <div id="Group1"> <img id="Pic1image" /> <span id="caption1"> Week 4 </span> </div>
+    <div id="Group2"> <img id="Pic2image" /> <span id="caption2"> Week 8 </span> </div>
   </div>
   <div id="captionOuter">
   </div>
     <script type="text/javascript">
-    document.getElementById('Pic1').onchange = function (evt) {
-    var tgt = evt.target || window.event.srcElement,
-        files = tgt.files;
+    function bindImage(fileInput, imageElement){
+      document.getElementById(fileInput).onchange = function (evt) {
+        var tgt = evt.target || window.event.srcElement,
+            files = tgt.files;
 
-    // FileReader support
-    if (FileReader && files && files.length) {
-        var fr = new FileReader();
-        fr.onload = function () {
-            document.getElementById("Pic1image").src = fr.result;
+        // FileReader support
+        if (FileReader && files && files.length) {
+          fixExifOrientation(imageElement, files[0]);
         }
-        fr.readAsDataURL(files[0]);
+      }
     }
+    bindImage('Pic1', 'Pic1image');
+    bindImage('Pic2', 'Pic2image');
+function bindCaption(textInput, captionSpan){
+  document.getElementById(textInput).onkeyup=function(evt){
+    document.getElementById(captionSpan).innerHTML = evt.target.value;
+  }
+}
+bindCaption('text1', 'caption1');
+bindCaption('text2', 'caption2');
+function fixExifOrientation(imageElement, file) {
+    EXIF.getData(file,function() {
+      var orientation = EXIF.getTag(this,"Orientation");
+      var can = document.createElement("canvas");
+      var ctx = can.getContext('2d');
+      var thisImage = new Image;
+      thisImage.onload = function() {
+        can.width  = thisImage.width;
+        can.height = thisImage.height;
+        ctx.save();
+        var width  = can.width;  var styleWidth  = can.style.width;
+        var height = can.height; var styleHeight = can.style.height;
+        if (orientation) {
+          if (orientation > 4) {
+            can.width  = height; can.style.width  = styleHeight;
+            can.height = width;  can.style.height = styleWidth;
+          }
+          switch (orientation) {
+            case 2: ctx.translate(width, 0);     ctx.scale(-1,1); break;
+            case 3: ctx.translate(width,height); ctx.rotate(Math.PI); break;
+            case 4: ctx.translate(0,height);     ctx.scale(1,-1); break;
+            case 5: ctx.rotate(0.5 * Math.PI);   ctx.scale(1,-1); break;
+            case 6: ctx.rotate(0.5 * Math.PI);   ctx.translate(0,-height); break;
+            case 7: ctx.rotate(0.5 * Math.PI);   ctx.translate(width,-height); ctx.scale(-1,1); break;
+            case 8: ctx.rotate(-0.5 * Math.PI);  ctx.translate(-width,0); break;
+          }
+        }
 
-    // Not supported
-    else {
-        // fallback -- perhaps submit the input to an iframe and temporarily store
-        // them on the server until the user's session ends.
-    }
-}
-document.getElementById('Pic2').onchange = function (evt) {
-var tgt = evt.target || window.event.srcElement,
-    files = tgt.files;
+        ctx.drawImage(thisImage,0,0);
+        ctx.restore();
+        var dataURL = can.toDataURL();
 
-// FileReader support
-if (FileReader && files && files.length) {
-    var fr = new FileReader();
-    fr.onload = function () {
-        document.getElementById("Pic2image").src = fr.result;
-    }
-    fr.readAsDataURL(files[0]);
-}
+        // at this point you can save the image away to your back-end using 'dataURL'
+       document.getElementById(imageElement).src = dataURL;
+      }
 
-// Not supported
-else {
-    // fallback -- perhaps submit the input to an iframe and temporarily store
-    // them on the server until the user's session ends.
-}
-}
-document.getElementById("text1").onkeyup=function(evt){
-  document.getElementById("caption1").innerHTML = evt.target.value;
-}
-document.getElementById("text2").onkeyup=function(evt){
-  document.getElementById("caption2").innerHTML = evt.target.value;
+      // now trigger the onload function by setting the src to your HTML5 file object (called 'file' here)
+      thisImage.src = URL.createObjectURL(file);
+    });
 }
 </script>
 </body>
